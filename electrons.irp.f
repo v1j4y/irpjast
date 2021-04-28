@@ -1,9 +1,40 @@
+integer function size_8(n) 
+ implicit none
+ integer, intent(in) :: n
+ integer :: n8
+
+ n8 = ((n-1)/8+1) * 8
+ if (popcnt(n8) == 1) then 
+    ! Power of two, shift by 8
+    n8 = n8 + 8
+ endif
+ size_8 = n8
+end
+
+BEGIN_PROVIDER [ integer, nelec_8 ]
+ implicit none
+ integer, external :: size_8
+ nelec_8 = size_8(nelec)
+END_PROVIDER
+
+
+
+
 BEGIN_PROVIDER [ integer, nelec ]
  implicit none
  BEGIN_DOC
  ! Number of electrons
  END_DOC
- nelec = 10
+
+ character*(32) :: buffer
+ integer, external :: iargc
+ if (iargc() == 0) then
+   nelec = 10
+ else
+  call getarg(1,buffer)
+  read(buffer,*)nelec
+ endif
+
 END_PROVIDER
 
 BEGIN_PROVIDER [ integer, nelec_up ]
@@ -11,7 +42,7 @@ BEGIN_PROVIDER [ integer, nelec_up ]
  BEGIN_DOC
  ! Number of alpha and beta electrons
  END_DOC
- nelec_up = 5
+ nelec_up = nelec/2
 END_PROVIDER
 
 
