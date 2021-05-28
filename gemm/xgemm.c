@@ -25,6 +25,9 @@
 
 #include "common/blas.h"
 
+#include <coreblas/lapacke.h>
+#include <chameleon.h>
+
 #ifdef STARPU_USE_CUDA
 #include <cuda.h>
 #include <cublas.h>
@@ -425,3 +428,11 @@ int run_stop_starpu_c()
 	starpu_cublas_shutdown();
 	starpu_shutdown();
 };
+
+int run_chameleon_dgemm_c(TYPE *A_inp, TYPE *B_inp, TYPE *C_inp, unsigned int m, 
+    unsigned int n, unsigned int k, unsigned int lda, unsigned int ldb, unsigned int ldc, double alpha, double beta)
+{
+  int ret=0;
+  CHAMELEON_dgemm('N','N',m, n, k, alpha, A_inp, lda, B_inp, ldb, beta, C_inp, ldc);
+  return ret;
+}
