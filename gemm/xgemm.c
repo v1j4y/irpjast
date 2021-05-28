@@ -18,6 +18,8 @@
 
 #include <limits.h>
 #include <string.h>
+#include <unistd.h>
+#include <sys/resource.h>
 #include <math.h>
 #include <sys/types.h>
 #include <sys/time.h>
@@ -429,10 +431,31 @@ int run_stop_starpu_c()
 	starpu_shutdown();
 };
 
+
+int run_init_chameleon_c(){
+  int NCPU, NGPU;
+  NCPU = sysconf(_SC_NPROCESSORS_ONLN);
+  NCPU = 64;
+  NGPU = 0;
+
+  CHAMELEON_Init( NCPU, NGPU );
+};
+
 int run_chameleon_dgemm_c(TYPE *A_inp, TYPE *B_inp, TYPE *C_inp, unsigned int m, 
     unsigned int n, unsigned int k, unsigned int lda, unsigned int ldb, unsigned int ldc, double alpha, double beta)
 {
   int ret=0;
-  CHAMELEON_dgemm('N','N',m, n, k, alpha, A_inp, lda, B_inp, ldb, beta, C_inp, ldc);
+  //int NCPU, NGPU;
+  //NCPU = sysconf(_SC_NPROCESSORS_ONLN);
+  //NGPU = 0;
+
+  //CHAMELEON_Init( NCPU, NGPU );
+  CHAMELEON_dgemm(ChamNoTrans,ChamNoTrans,m, n, k, alpha, A_inp, lda, B_inp, ldb, beta, C_inp, ldc);
+  //CHAMELEON_Finalize();
   return ret;
 }
+
+int run_stop_chameleon_c()
+{
+  CHAMELEON_Finalize();
+};

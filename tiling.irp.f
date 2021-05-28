@@ -117,7 +117,7 @@ END_PROVIDER
  integer :: ii, jj, aa, kk, ll
  integer :: res
 
- call run_init_starpu_c()
+ call run_init_chameleon_c()
 
  ! r_{ij}^k . R_{ja}^l -> tmp_c_{ia}^{kl}
  do k=0,ncord-1
@@ -187,9 +187,9 @@ END_PROVIDER
                               dtmp_c1(1,1,1,0,0),                      &
                               4*nelec_16, nnuc_16*(ncord+1),           &
                               nelec_16,                                &
-                              size(rescale_een_e_deriv_e,1),           &
+                              4*size(rescale_een_e_deriv_e,1),           &
                               size(rescale_een_n,1),                   &
-                              size(dtmp_c1,1),                         &
+                              4*size(dtmp_c1,1),                         &
                               1.0d0, 0.0d0)
 
    !call run_magma_dgemm_async_gpu_c(rescale_een_e_deriv_e(1,1,1,k), &
@@ -251,7 +251,7 @@ END_PROVIDER
    !enddo
  enddo
 
- call run_stop_starpu_c()
+ call run_stop_chameleon_c()
 
 END_PROVIDER
 

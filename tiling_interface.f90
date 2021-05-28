@@ -12,6 +12,14 @@
            real(KIND=C_DOUBLE):: B(k,n)
            real(KIND=C_DOUBLE):: C(m,n)
            end subroutine run_chameleon_dgemm_c
+           subroutine run_init_chameleon_c() bind(C)
+           use :: ISO_C_BINDING
+           implicit none
+           end subroutine run_init_chameleon_c
+           subroutine run_stop_chameleon_c() bind(C)
+           use :: ISO_C_BINDING
+           implicit none
+           end subroutine run_stop_chameleon_c
            subroutine run_magma_dgemm_async_gpu_c(A, B, C, m, n, k,lda,&
              ldb, ldc) bind(C)
            use :: ISO_C_BINDING
