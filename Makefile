@@ -9,7 +9,7 @@ RANLIB = ranlib
 
 SRC=  tiling_interface.f90
 OBJ=  tiling_interface.o
-LIB= $(MAGMA_F90FLAGS) $(LDFLAGS) $(MAGMA_LIBS) $(STARPU_CFLAGS) $(STARPU_LIBS) -L${GLIB} -lstdc++  magma_dgemm_async_gpu.o dgemm.o gemm/common/blas.o
+LIB= $(MAGMA_F90FLAGS) $(LDFLAGS) $(MAGMA_LIBS) $(STARPU_CFLAGS) $(STARPU_LIBS) -L${GLIB} -lstdc++  magma_dgemm_async_gpu.o dgemm.o gemm/common/blas.o $(CHAMELEON_LIBS) 
 MAGMA         = /p/software/juwelsbooster/stages/2020/software/magma/2.5.4-gcccoremkl-9.3.0-2020.2.254
 MAGMADIR      = /p/software/juwelsbooster/stages/2020/software/magma/2.5.4-gcccoremkl-9.3.0-2020.2.254
 FORTRAN       = /p/software/juwelsbooster/stages/2020/software/GCCcore/9.3.0/lib64
@@ -21,6 +21,14 @@ MAGMA_F90FLAGS := -I$(MAGMADIR)/include -Dmagma_devptr_t="integer(kind=8)"
 
 MAGMA_LIBS   := -L$(MAGMADIR)/lib -L$(CUDADIR)/lib64 -L$(OPENBLASDIR)/lib \
                 -lmagma -lcublas -lcudart -lmkl
+
+## CHAMELEON ###
+CHAMELEON_LIBS=/p/project/training2105/Quantum_Package/chameleon/build/lib/libchameleon.a
+CHAMELEON_LIBS +=/p/project/training2105/Quantum_Package/chameleon/build/lib/libchameleon_starpu.a
+CHAMELEON_LIBS +=/p/project/training2105/Quantum_Package/chameleon/build/lib/libcoreblas.a
+CHAMELEON_LIBS = $(shell pkg-config --libs chameleon)
+CHAMELEON_CFLAGS =-I/p/project/training2105/Quantum_Package/chameleon/build/include
+
 ## STAR PU ###
 STARPU_VERSION=1.3
 CPPFLAGS += $(shell pkg-config --cflags starpu-$(STARPU_VERSION))
@@ -70,7 +78,7 @@ tiling_interface.o: tiling_interface.f90
 CFLAGS+=-DSTARPU_OPENBLAS=0
 
 dgemm.o:
-	$(CC) $(CFLAGS) $(STARPU_CFLAGS) -c gemm/dgemm.c 
+	$(CC) $(CFLAGS) $(STARPU_CFLAGS) $(CHAMELEON_CFLAGS) -c gemm/dgemm.c 
 
 gemm/dgemm: gemm/dgemm.o gemm/common/blas.o
 
