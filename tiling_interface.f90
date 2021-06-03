@@ -12,6 +12,17 @@
            real(KIND=C_DOUBLE):: B(k,n)
            real(KIND=C_DOUBLE):: C(m,n)
            end subroutine run_chameleon_dgemm_c
+           subroutine run_chameleon_dgemm_tile_c(A, B, C, m, n, k,lda,&
+             ldb, ldc, alpha, beta) bind(C)
+           use :: ISO_C_BINDING
+           implicit none
+           integer(KIND=C_INT), value :: n,m,k
+           integer(KIND=C_INT), value :: lda, ldb, ldc
+           real(KIND=C_DOUBLE), value :: alpha, beta
+           real(KIND=C_DOUBLE):: A(m,k)
+           real(KIND=C_DOUBLE):: B(k,n)
+           real(KIND=C_DOUBLE):: C(m,n)
+           end subroutine run_chameleon_dgemm_tile_c
            subroutine run_init_chameleon_c() bind(C)
            use :: ISO_C_BINDING
            implicit none

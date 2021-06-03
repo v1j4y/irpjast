@@ -435,7 +435,7 @@ int run_stop_starpu_c()
 int run_init_chameleon_c(){
   int NCPU, NGPU;
   NCPU = sysconf(_SC_NPROCESSORS_ONLN);
-  NCPU = 64;
+  NCPU = 1;
   NGPU = 0;
 
   CHAMELEON_Init( NCPU, NGPU );
@@ -452,6 +452,55 @@ int run_chameleon_dgemm_c(TYPE *A_inp, TYPE *B_inp, TYPE *C_inp, unsigned int m,
   //CHAMELEON_Init( NCPU, NGPU );
   CHAMELEON_dgemm(ChamNoTrans,ChamNoTrans,m, n, k, alpha, A_inp, lda, B_inp, ldb, beta, C_inp, ldc);
   //CHAMELEON_Finalize();
+  return ret;
+}
+
+int run_chameleon_dgemm_tile_c(TYPE *A_inp, TYPE *B_inp, TYPE *C_inp, unsigned int m, 
+    unsigned int n, unsigned int k, unsigned int lda, unsigned int ldb, unsigned int ldc, double alpha, double beta)
+{
+  int ret=0;
+  int NB;
+  int UPLO = ChamUpper;
+
+  /* descriptors necessary for calling CHAMELEON tile interface  */
+  CHAM_desc_t *descA = NULL, *descC = NULL, *descB = NULL;
+
+
+  /* Get block size
+   *  */
+  CHAMELEON_Get( CHAMELEON_TILE_SIZE, &NB);
+
+  CHAMELEON_Desc_Create(&descA,  NULL, ChamRealDouble,
+                    NB, NB,  NB*NB, m, k, 0, 0, m, k, 1, 1);
+  CHAMELEON_Desc_Create(&descB,  NULL, ChamRealDouble,
+                    NB, NB,  NB*NB, k, n, 0, 0, k, n, 1, 1);
+  CHAMELEON_Desc_Create(&descC,  NULL, ChamRealDouble,
+                    NB, NB,  NB*NB, m, n, 0, 0, m, n, 1, 1);
+
+
+  /* copy LAPACK matrices in CHAMELEON
+   * interface */
+  CHAMELEON_dLap2Desc(ChamUpperLower, A_inp,    m, descA);
+  CHAMELEON_dLap2Desc(ChamUpperLower, B_inp,    k, descB);
+  CHAMELEON_dLap2Desc(ChamUpperLower, C_inp,    m, descC);
+
+
+  CHAMELEON_dgemm_Tile(ChamNoTrans,
+                  ChamNoTrans,
+                  1.0,
+                  descA,
+                  descB,
+                  0.0,
+                  descC);
+
+  /* get back results in LAPACK format if needed */
+  CHAMELEON_dDesc2Lap(ChamUpperLower, descC,  C,    m);
+
+  /* deallocate A, B, X, Acpy and associated descriptors descA, ... */
+  CHAMELEON_Desc_Destroy( &descA );
+  CHAMELEON_Desc_Destroy( &descB );
+  CHAMELEON_Desc_Destroy( &descC );
+
   return ret;
 }
 

@@ -1,5 +1,5 @@
 FC     = ifort -O3 -ip -g -xHost -align array64byte -fma -ftz -fomit-frame-pointer -mkl=parallel #-O3 -march=native -mkl=sequential -g -I$(PWD) #-xHost -check all 
-CC     = gcc
+CC     = gcc 
 CPP    = g++ -O2 -march=native # -Wall
 FCFLAGS= -I .#-O2 -ffree-line-length-none -I .
 NINJA  = ninja
@@ -9,7 +9,7 @@ RANLIB = ranlib
 
 SRC=  tiling_interface.f90
 OBJ=  tiling_interface.o
-LIB= $(MAGMA_F90FLAGS) $(LDFLAGS) $(MAGMA_LIBS) $(STARPU_CFLAGS) $(STARPU_LIBS) -L${GLIB} -lstdc++  magma_dgemm_async_gpu.o dgemm.o gemm/common/blas.o $(CHAMELEON_LIBS) 
+LIB= $(MAGMA_F90FLAGS) $(LDFLAGS) $(MAGMA_LIBS) $(STARPU_CFLAGS) $(STARPU_LIBS) -L${GLIB} -lstdc++  dgemm.o gemm/common/blas.o $(CHAMELEON_LIBS) 
 MAGMA         = /p/software/juwelsbooster/stages/2020/software/magma/2.5.4-gcccoremkl-9.3.0-2020.2.254
 MAGMADIR      = /p/software/juwelsbooster/stages/2020/software/magma/2.5.4-gcccoremkl-9.3.0-2020.2.254
 FORTRAN       = /p/software/juwelsbooster/stages/2020/software/GCCcore/9.3.0/lib64
@@ -19,8 +19,8 @@ OPENBLASDIR  ?= /p/software/juwelsbooster/stages/2020/software/GCC/
 MAGMA_CFLAGS   := -DADD_ -I$(MAGMADIR)/include -I$(CUDADIR)/include
 MAGMA_F90FLAGS := -I$(MAGMADIR)/include -Dmagma_devptr_t="integer(kind=8)"
 
-MAGMA_LIBS   := -L$(MAGMADIR)/lib -L$(CUDADIR)/lib64 -L$(OPENBLASDIR)/lib \
-                -lmagma -lcublas -lcudart -lmkl
+MAGMA_LIBS   := -L$(MAGMADIR)/lib -L$(CUDADIR)/lib64 -L$(OPENBLASDIR)/lib -L/opt/intel/oneapi/mkl/latest/lib/intel64 \
+                -lblas #-lmagma -lcublas -lcudart -lmkl
 
 ## CHAMELEON ###
 CHAMELEON_LIBS=/p/project/training2105/Quantum_Package/chameleon/build/lib/libchameleon.a
@@ -28,6 +28,7 @@ CHAMELEON_LIBS +=/p/project/training2105/Quantum_Package/chameleon/build/lib/lib
 CHAMELEON_LIBS +=/p/project/training2105/Quantum_Package/chameleon/build/lib/libcoreblas.a
 CHAMELEON_LIBS = $(shell pkg-config --libs chameleon)
 CHAMELEON_CFLAGS =-I/p/project/training2105/Quantum_Package/chameleon/build/include
+CHAMELEON_CFLAGS =$(shell pkg-config --cflags chameleon)
 
 ## STAR PU ###
 STARPU_VERSION=1.3
@@ -59,14 +60,14 @@ IRPF90 = irpf90 --codelet=elec_dist:2 -s tile_size:32
 -include irpf90.make
 export
 
-irpf90.make: fortran.o tiling_interface.o magma_dgemm_async_gpu.o dgemm.o $(filter-out IRPF90_temp/%, $(wildcard */*.irp.f)) $(wildcard *.irp.f) $(wildcard *.inc.f) Makefile
+irpf90.make:  tiling_interface.o dgemm.o $(filter-out IRPF90_temp/%, $(wildcard */*.irp.f)) $(wildcard *.irp.f) $(wildcard *.inc.f) Makefile
 	$(IRPF90)
 
-magma_dgemm_async_gpu.o: 
-	${CPP} $(CFLAGS) $(MAGMA_CFLAGS) -DCUBLAS_GFORTRAN -c magma_dgemm_async_gpu.cc -o magma_dgemm_async_gpu.o
+#magma_dgemm_async_gpu.o: 
+#	${CPP} $(CFLAGS) $(MAGMA_CFLAGS) -DCUBLAS_GFORTRAN -c magma_dgemm_async_gpu.cc -o magma_dgemm_async_gpu.o
 
-fortran.o: $(CUDADIR)/src/fortran.c
-	$(CC) $(CFLAGS) $(MAGMA_CFLAGS) -DCUBLAS_GFORTRAN -c -o $@ $<
+#fortran.o: $(CUDADIR)/src/fortran.c
+#	$(CC) $(CFLAGS) $(MAGMA_CFLAGS) -DCUBLAS_GFORTRAN -c -o $@ $<
 
 tiling_interface.o: tiling_interface.f90
 	$(FC) $(FFLAGS) -c -o $@ $<
@@ -79,6 +80,9 @@ CFLAGS+=-DSTARPU_OPENBLAS=0
 
 dgemm.o:
 	$(CC) $(CFLAGS) $(STARPU_CFLAGS) $(CHAMELEON_CFLAGS) -c gemm/dgemm.c 
+
+gemm/common/blas.o:
+	$(CC) $(CFLAGS) $(STARPU_CFLAGS) $(CHAMELEON_CFLAGS) -c gemm/common/blas.c
 
 gemm/dgemm: gemm/dgemm.o gemm/common/blas.o
 

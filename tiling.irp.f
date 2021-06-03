@@ -121,6 +121,12 @@ END_PROVIDER
 
  ! r_{ij}^k . R_{ja}^l -> tmp_c_{ia}^{kl}
  do k=0,ncord-1
+
+   !call dgemm('N','N', nelec_16, nnuc_16*(ncord+1), nelec_16, 1.d0,           &
+   !    rescale_een_e(1,1,k), size(rescale_een_e,1),                  &
+   !    rescale_een_n(1,1,0), size(rescale_een_n,1), 0.d0,            &
+   !    tmp_c1(1,1,0,k), size(tmp_c1,1))
+
    call run_chameleon_dgemm_c(rescale_een_e(1,1,k),          &
                               rescale_een_n(1,1,k),          &
                               tmp_c1(1,1,0,k),               &
@@ -130,7 +136,6 @@ END_PROVIDER
                               size(rescale_een_n,1),         &
                               size(tmp_c1,1),                &
                               1.0d0, 0.0d0)
-
 
    !call run_magma_dgemm_async_gpu_c(rescale_een_e(1,1,k),       &
    !                                rescale_een_n(1,1,0), &
@@ -182,14 +187,19 @@ END_PROVIDER
 
  ! dr_{ij}^k . R_{ja}^l -> dtmp_c_{ia}^{kl}
  do k=0,ncord-1
+   !call dgemm('N','N', 4*nelec_16, nnuc_16*(ncord+1), nelec, 1.d0,         &
+   !    rescale_een_e_deriv_e(1,1,1,k), 4*size(rescale_een_e_deriv_e,1),&
+   !    rescale_een_n(1,1,0), size(rescale_een_n,1), 0.d0,            &
+   !    dtmp_c1(1,1,1,0,k), 4*size(dtmp_c1,1))
+
    call run_chameleon_dgemm_c(rescale_een_e_deriv_e(1,1,1,0),          &
                               rescale_een_n(1,1,0),                    &
                               dtmp_c1(1,1,1,0,0),                      &
                               4*nelec_16, nnuc_16*(ncord+1),           &
                               nelec_16,                                &
-                              4*size(rescale_een_e_deriv_e,1),           &
+                              4*size(rescale_een_e_deriv_e,1),         &
                               size(rescale_een_n,1),                   &
-                              4*size(dtmp_c1,1),                         &
+                              4*size(dtmp_c1,1),                       &
                               1.0d0, 0.0d0)
 
    !call run_magma_dgemm_async_gpu_c(rescale_een_e_deriv_e(1,1,1,k), &

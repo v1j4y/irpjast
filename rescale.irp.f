@@ -52,6 +52,9 @@ BEGIN_PROVIDER [ double precision, rescale_ee_deriv_e, (4, nelec_16, nelec_16) ]
        (-kappa * rescale_ee_deriv_e(1, i, j) * rescale_ee_deriv_e(1, i, j)) + &
        (-kappa * rescale_ee_deriv_e(2, i, j) * rescale_ee_deriv_e(2, i, j)) + &
        (-kappa * rescale_ee_deriv_e(3, i, j) * rescale_ee_deriv_e(3, i, j))
+       print *, i,j,"-----------------",rescale_ee_deriv_e(1, i, j) * rescale_ee_deriv_e(1, i, j) + &
+                rescale_ee_deriv_e(2, i, j) * rescale_ee_deriv_e(2, i, j) + &
+                rescale_ee_deriv_e(3, i, j) * rescale_ee_deriv_e(3, i, j)
        do ii = 1, 4
           rescale_ee_deriv_e(ii, i, j) = rescale_ee_deriv_e(ii, i, j) &
                * f

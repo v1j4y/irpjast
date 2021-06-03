@@ -21,7 +21,6 @@ program codelet_factor_een_blas
   ticks_0 = irp_rdtsc()
   do i=1,irp_imax
   print *,i
-    !call bld_tmp_c_tiled
     call bld_tmp_c
     call bld_factor_een_blas
   enddo
