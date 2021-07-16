@@ -13,7 +13,7 @@ program codelet_factor_een_blas_tiled_wj
   double precision :: irp_rdtsc
 
   irp_imax = max(1_8,20_8 * 125000000_8 /(int(nelec,8) * int(nelec,8) * int(nnuc,8) * ncord))
-  irp_imax = 1
+  irp_imax = 40
   print *,"irp_imax=",irp_imax
 
   call cpu_time(cpu_0)

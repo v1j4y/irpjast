@@ -40,7 +40,7 @@ def get_sphere_distribution(n, dmin, Ls, maxiter=1e4, allow_wall=True):
     fill_dens = n*sphere_vol/box_vol
     print(fill_dens,Ls, dmin,sphere_vol)
     if fill_dens > 0.64:
-        msg = f'Too many to fit in the volume, density {fill_dens:.3g}>0.64'
+        #msg = f'Too many to fit in the volume, density {fill_dens:.3g}>0.64'
         raise ValueError(msg)
 
     # initial try
@@ -176,7 +176,7 @@ def get_sphere_distribution(n, dmin, Ls, maxiter=1e4, allow_wall=True):
     box_vol = np.prod(Ls + 0.5*dmin)
     fill_dens = n*sphere_vol/box_vol
     if fill_dens > 0.64:
-        msg = f'Too many to fit in the volume, density {fill_dens:.3g}>0.64'
+        #msg = f'Too many to fit in the volume, density {fill_dens:.3g}>0.64'
         raise ValueError(msg)
 
     # initial try

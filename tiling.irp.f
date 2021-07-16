@@ -196,10 +196,10 @@ END_PROVIDER
    do j = 0, ntiles_nelec - 1
      do a = 0, ntiles_nnuc - 1
        do i = 0, ntiles_nelec - 1
-   !call dgemm('N','N', tile_size, tile_size*(ncord+1), tile_size, 1.d0,           &
-   !    rescale_een_e_tiled(1,1,j,i,k), size(rescale_een_e_tiled,1),                  &
-   !    rescale_een_n_tiled(1,1,0,i,a), size(rescale_een_n_tiled,1), 1.d0,            &
-   !    tmp_c_tiled(1,1,0,j,a,k), size(tmp_c_tiled,1))
+   call dgemm('N','N', tile_size, tile_size*(ncord+1), tile_size, 1.d0,           &
+       rescale_een_e_tiled(1,1,j,i,k), size(rescale_een_e_tiled,1),                  &
+       rescale_een_n_tiled(1,1,0,i,a), size(rescale_een_n_tiled,1), 1.d0,            &
+       tmp_c_tiled(1,1,0,j,a,k), size(tmp_c_tiled,1))
    !call run_magma_dgemm_async_gpu_c(rescale_een_e_tiled(1,1,j,i,k),       &
    !                                rescale_een_n_tiled(1,1,0,i,a), &
    !                                tmp_c_tiled(1,1,0,j,a,k),       &
@@ -208,26 +208,26 @@ END_PROVIDER
    !                                size(rescale_een_e_tiled,1),    &
    !                                size(rescale_een_n_tiled,1),    &
    !                                size(tmp_c_tiled,1))
-        do m = 0, ncord
-              !DIR$ vector aligned
-          do jj = 1, tile_size
-            !DIR$ vector aligned
-            do kk = 1, tile_size, 4
-              !DIR$ vector aligned
-              do ii = 1, tile_size
-                 tmp_c_tiled(ii,jj,m,j,a,k) = tmp_c_tiled(ii,jj,m,j,a,k) + &
-                                          rescale_een_e_tiled(ii,kk+0,j,i,k)*&
-                                          rescale_een_n_tiled(kk+0,jj,m,i,a)+&
-                                          rescale_een_e_tiled(ii,kk+1,j,i,k)*&
-                                          rescale_een_n_tiled(kk+1,jj,m,i,a)+&
-                                          rescale_een_e_tiled(ii,kk+2,j,i,k)*&
-                                          rescale_een_n_tiled(kk+2,jj,m,i,a)+&
-                                          rescale_een_e_tiled(ii,kk+3,j,i,k)*&
-                                          rescale_een_n_tiled(kk+3,jj,m,i,a)
-            enddo
-           enddo
-         enddo
-        enddo
+   !     do m = 0, ncord
+   !           !DIR$ vector aligned
+   !       do jj = 1, tile_size
+   !         !DIR$ vector aligned
+   !         do kk = 1, tile_size, 4
+   !           !DIR$ vector aligned
+   !           do ii = 1, tile_size
+   !              tmp_c_tiled(ii,jj,m,j,a,k) = tmp_c_tiled(ii,jj,m,j,a,k) + &
+   !                                       rescale_een_e_tiled(ii,kk+0,j,i,k)*&
+   !                                       rescale_een_n_tiled(kk+0,jj,m,i,a)+&
+   !                                       rescale_een_e_tiled(ii,kk+1,j,i,k)*&
+   !                                       rescale_een_n_tiled(kk+1,jj,m,i,a)+&
+   !                                       rescale_een_e_tiled(ii,kk+2,j,i,k)*&
+   !                                       rescale_een_n_tiled(kk+2,jj,m,i,a)+&
+   !                                       rescale_een_e_tiled(ii,kk+3,j,i,k)*&
+   !                                       rescale_een_n_tiled(kk+3,jj,m,i,a)
+   !         enddo
+   !        enddo
+   !      enddo
+   !     enddo
        enddo
      enddo
    enddo
@@ -240,10 +240,10 @@ END_PROVIDER
    do a = 0, ntiles_nnuc - 1
      do j = 0, ntiles_nelec - 1
        do i = 0, ntiles_nelec - 1
-   !call dgemm('N','N', 4*tile_size, tile_size*(ncord+1), tile_size, 1.d0,         &
-   !    rescale_een_e_deriv_e_tiled(1,1,1,j,i,k), 4*size(rescale_een_e_deriv_e_tiled,1),&
-   !    rescale_een_n_tiled(1,1,0,i,a), size(rescale_een_n_tiled,1), 1.d0,            &
-   !    dtmp_c_tiled(1,1,1,0,j,a,k), 4*size(dtmp_c_tiled,1))
+   call dgemm('N','N', 4*tile_size, tile_size*(ncord+1), tile_size, 1.d0,         &
+       rescale_een_e_deriv_e_tiled(1,1,1,j,i,k), 4*size(rescale_een_e_deriv_e_tiled,1),&
+       rescale_een_n_tiled(1,1,0,i,a), size(rescale_een_n_tiled,1), 1.d0,            &
+       dtmp_c_tiled(1,1,1,0,j,a,k), 4*size(dtmp_c_tiled,1))
 
    !call run_magma_dgemm_async_gpu_c(rescale_een_e_deriv_e_tiled(1,1,1,k,j,i), &
    !                                rescale_een_n_tiled(1,1,0,i,a),            &
@@ -253,29 +253,29 @@ END_PROVIDER
    !                                4*size(rescale_een_e_deriv_e_tiled,1),     &
    !                                size(rescale_een_n_tiled,1),               &
    !                                4*size(dtmp_c_tiled,1))
-        do m = 0, ncord
-              !DIR$ vector aligned
-          do ll = 1, 4
-              !DIR$ vector aligned
-           do jj = 1, tile_size
-             !DIR$ vector aligned
-             do kk = 1, tile_size, 4
-               !DIR$ vector aligned
-               do ii = 1, tile_size
-                 dtmp_c_tiled(ii,jj,ll,m,j,a,k) =       dtmp_c_tiled(ii,jj,ll,m,j,a,k) +   &
-                                       rescale_een_e_deriv_e_tiled(ii,kk+0,ll,j,i,k)   *   &
-                                                 rescale_een_n_tiled(kk+0,jj,m,i,a)    +   &
-                                       rescale_een_e_deriv_e_tiled(ii,kk+1,ll,j,i,k)   *   &
-                                                 rescale_een_n_tiled(kk+1,jj,m,i,a)    +   &
-                                       rescale_een_e_deriv_e_tiled(ii,kk+2,ll,j,i,k)   *   &
-                                                 rescale_een_n_tiled(kk+2,jj,m,i,a)    +   &
-                                       rescale_een_e_deriv_e_tiled(ii,kk+3,ll,j,i,k)   *   &
-                                                 rescale_een_n_tiled(kk+3,jj,m,i,a)
-             enddo
-            enddo
-           enddo
-         enddo
-        enddo
+   !    do m = 0, ncord
+   !          !DIR$ vector aligned
+   !      do ll = 1, 4
+   !          !DIR$ vector aligned
+   !       do jj = 1, tile_size
+   !         !DIR$ vector aligned
+   !         do kk = 1, tile_size, 4
+   !           !DIR$ vector aligned
+   !           do ii = 1, tile_size
+   !             dtmp_c_tiled(ii,jj,ll,m,j,a,k) =       dtmp_c_tiled(ii,jj,ll,m,j,a,k) +   &
+   !                                   rescale_een_e_deriv_e_tiled(ii,kk+0,ll,j,i,k)   *   &
+   !                                             rescale_een_n_tiled(kk+0,jj,m,i,a)    +   &
+   !                                   rescale_een_e_deriv_e_tiled(ii,kk+1,ll,j,i,k)   *   &
+   !                                             rescale_een_n_tiled(kk+1,jj,m,i,a)    +   &
+   !                                   rescale_een_e_deriv_e_tiled(ii,kk+2,ll,j,i,k)   *   &
+   !                                             rescale_een_n_tiled(kk+2,jj,m,i,a)    +   &
+   !                                   rescale_een_e_deriv_e_tiled(ii,kk+3,ll,j,i,k)   *   &
+   !                                             rescale_een_n_tiled(kk+3,jj,m,i,a)
+   !         enddo
+   !        enddo
+   !       enddo
+   !     enddo
+   !    enddo
        enddo
      enddo
    enddo
@@ -524,6 +524,7 @@ end subroutine foo_simd
  integer :: res
  type(simd_real8) :: buffer_x1, buffer_x2, buffer_y
  type(simd_mask8) :: msk
+
 
  ! r_{ij}^k . R_{ja}^l -> tmp_c_{ia}^{kl}
  !$OMP parallel                               &

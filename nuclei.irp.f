@@ -5,7 +5,7 @@ BEGIN_PROVIDER [ integer, nnuc ]
  END_DOC
  !nnuc = 2
 ! read(*,*)nnuc
- nnuc = nelec/5
+ nnuc = nelec/4
 END_PROVIDER
 
  BEGIN_PROVIDER [ integer, nnuc_16 ]

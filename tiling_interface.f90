@@ -20,6 +20,22 @@
            real(KIND=C_DOUBLE):: B(k,n)
            real(KIND=C_DOUBLE):: C(m,n)
            end subroutine run_magma_dgemm_async_gpu_c
+           subroutine run_simd_dgemmc_c(A, B, C, m, n, k) bind(C)
+           use :: ISO_C_BINDING
+           implicit none
+           integer(KIND=C_INT), value :: n,m,k
+           real(KIND=C_DOUBLE):: A(m,k)
+           real(KIND=C_DOUBLE):: B(k,n)
+           real(KIND=C_DOUBLE):: C(m,n)
+           end subroutine run_simd_dgemmc_c
+           subroutine run_simd_dgemmd_c(A, B, C, m, n, k) bind(C)
+           use :: ISO_C_BINDING
+           implicit none
+           integer(KIND=C_INT), value :: n,m,k
+           real(KIND=C_DOUBLE):: A(m,k)
+           real(KIND=C_DOUBLE):: B(k,n)
+           real(KIND=C_DOUBLE):: C(m,n)
+           end subroutine run_simd_dgemmd_c
          end interface
        end module
 

@@ -1,6 +1,7 @@
 FC     = ifort -O3 -ip -g -xCORE-AVX512 -qopt-zmm-usage=high -mkl=parallel -fopenmp -align rec32byte -align array32byte -fpp # -fma -ftz -fomit-frame-pointer -O3 -march=native -mkl=sequential -g -I$(PWD) #-xHost -check all 
 CC     = gcc
-CPP    = g++ -O2 -march=native # -Wall
+CPP    = icpc -O3  -g
+CXXFLAGS = -I. -I/users/p18005/gopalchi/.local/include -I/users/p18005/gopalchi/TREX/vijay_fork/irpjast/MIPP/src -DDGEMM_PAGE_SIZE=4096 -DCACHELINE_SIZE=64 -march=native -mtune=native
 FCFLAGS= #-O2 -ffree-line-length-none -I .
 NINJA  = ninja
 AR = ar
@@ -52,8 +53,11 @@ IRPF90 = irpf90 --codelet=elec_dist:2 -s tile_size:24
 export
 
 #irpf90.make: fortran.o tiling_interface.o magma_dgemm_async_gpu.o dgemm.o $(filter-out IRPF90_temp/%, $(wildcard */*.irp.f)) $(wildcard *.irp.f) $(wildcard *.inc.f) Makefile
-irpf90.make: tiling_interface.o $(filter-out IRPF90_temp/%, $(wildcard */*.irp.f)) $(wildcard *.irp.f) $(wildcard *.inc.f) Makefile
+irpf90.make: tiling_interface.o gemm/simd.o $(filter-out IRPF90_temp/%, $(wildcard */*.irp.f)) $(wildcard *.irp.f) $(wildcard *.inc.f) Makefile
 	$(IRPF90)
+
+gemm/simd.o: 
+	${CPP} $(CXXFLAGS) -c gemm/simd.cpp -o gemm/simd.o
 
 #magma_dgemm_async_gpu.o: 
 #	${CPP} $(CFLAGS) $(MAGMA_CFLAGS) -DCUBLAS_GFORTRAN -c magma_dgemm_async_gpu.cc -o magma_dgemm_async_gpu.o

@@ -4,6 +4,7 @@ BEGIN_PROVIDER [ integer, nelec ]
  ! Number of electrons
  END_DOC
  nelec = 2000
+ nelec = 512
  !read(*,*)nelec
 END_PROVIDER
 
